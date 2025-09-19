@@ -33,17 +33,17 @@
         <div class="mb-4">
           <input type="email" formControlName="correoElectronico" class="input-bordered w-full input input-lg"
             placeholder="Email" autocomplete="email" />
-          <div *ngIf="loginForm.get('correoElectronico')?.touched && loginForm.get('correoElectronico')?.invalid"
+          <div *ngIf="loginForm.get('correoElectronico')!.touched && loginForm.get('correoElectronico')!.invalid"
             class="mt-1 text-red-500 text-xs">
-            <span *ngIf="loginForm.get('correoElectronico')?.errors?.['required']">El correo es obligatorio.</span>
-            <span *ngIf="loginForm.get('correoElectronico')?.errors?.['email']">Correo inválido.</span>
+            <span *ngIf="loginForm.get('correoElectronico')!.errors?.['required']">El correo es obligatorio.</span>
+            <span *ngIf="loginForm.get('correoElectronico')!.errors?.['email']">Correo inválido.</span>
           </div>
         </div>
         <!-- Password -->
         <div class="mb-4">
           <input type="password" formControlName="contrasena" class="input-bordered w-full input input-lg"
             placeholder="Password" autocomplete="current-password" />
-          <div *ngIf="loginForm.get('contrasena')?.touched && loginForm.get('contrasena')?.invalid"
+          <div *ngIf="loginForm.get('contrasena')!.touched && loginForm.get('contrasena')!.invalid"
             class="mt-1 text-red-500 text-xs">
             <span>La contraseña es obligatoria.</span>
           </div>

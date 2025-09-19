@@ -8,7 +8,7 @@
       <img src="/avatar-placeholder.png" alt="Avatar"
         class="shadow-md mb-4 border-2 border-primary-200 rounded-full w-20 h-20 object-cover" />
       <div class="mb-1 font-bold text-black text-xl">{{ user.nombre }}</div>
-  <div class="mb-2 font-semibold text-black text-sm">{{ user.rol }}</div>
+      <div class="mb-2 font-semibold text-black text-sm">{{ user.rol }}</div>
       <div class="mb-4 text-black text-center">{{ user.correoElectronico }}</div>
       <div class="flex gap-2 mb-2">
         <button
@@ -23,7 +23,7 @@
           <path stroke-linecap="round" stroke-linejoin="round"
             d="M8 17l4 4 4-4m0-5V3m-8 9v6a2 2 0 002 2h4a2 2 0 002-2v-6" />
         </svg>
-        Miembro desde {{ user.createdAt | date:'longDate' }}
+        Miembro desde {{ user.fechaRegistro | date:'longDate' }}
       </div>
     </div>
   </div>

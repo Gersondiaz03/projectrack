@@ -11,7 +11,7 @@
       <label class="block mb-1 font-semibold text-black">Responder</label>
       <textarea formControlName="cuerpo" rows="4" class="mb-2 px-3 py-2 border rounded w-full"
         placeholder="Escribe tu respuesta..."></textarea>
-      <div *ngIf="responseForm.get('cuerpo')?.touched && responseForm.get('cuerpo')?.invalid"
+      <div *ngIf="responseForm.get('cuerpo')!.touched && responseForm.get('cuerpo')!.invalid"
         class="mb-2 text-black text-xs">
         La respuesta es obligatoria y máximo 1000 caracteres.
       </div>

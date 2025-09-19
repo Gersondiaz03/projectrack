@@ -9,9 +9,9 @@
       </option>
     </select>
     <div class="mt-1 text-black text-xs">
-      Valor seleccionado: {{ form.get('destinatarioId')?.value }}
+      Valor seleccionado: {{ form.get('destinatarioId')!.value }}
     </div>
-    <div *ngIf="form.get('destinatarioId')?.touched && form.get('destinatarioId')?.invalid"
+    <div *ngIf="form.get('destinatarioId')!.touched && form.get('destinatarioId')!.invalid"
       class="mt-1 text-black text-xs">
       Debes seleccionar un destinatario.
     </div>
@@ -20,9 +20,9 @@
     <label class="block mb-1 font-semibold">Asunto</label>
     <input type="text" formControlName="asunto" class="px-3 py-2 border rounded w-full" placeholder="Asunto" />
     <div class="mt-1 text-black text-xs">
-      Valor ingresado: {{ form.get('asunto')?.value }}
+      Valor ingresado: {{ form.get('asunto')!.value }}
     </div>
-    <div *ngIf="form.get('asunto')?.touched && form.get('asunto')?.invalid" class="mt-1 text-black text-xs">
+    <div *ngIf="form.get('asunto')!.touched && form.get('asunto')!.invalid" class="mt-1 text-black text-xs">
       El asunto es obligatorio y máximo 100 caracteres.
     </div>
   </div>
@@ -31,9 +31,9 @@
     <textarea formControlName="cuerpo" rows="6" class="px-3 py-2 border rounded w-full"
       placeholder="Escribe tu mensaje..."></textarea>
     <div class="mt-1 text-black text-xs">
-      Valor ingresado: {{ form.get('cuerpo')?.value }}
+      Valor ingresado: {{ form.get('cuerpo')!.value }}
     </div>
-    <div *ngIf="form.get('cuerpo')?.touched && form.get('cuerpo')?.invalid" class="mt-1 text-black text-xs">
+    <div *ngIf="form.get('cuerpo')!.touched && form.get('cuerpo')!.invalid" class="mt-1 text-black text-xs">
       El mensaje es obligatorio y máximo 1000 caracteres.
     </div>
   </div>
