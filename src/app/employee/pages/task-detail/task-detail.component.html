@@ -17,8 +17,7 @@
         </div>
     </div>
     <div class="task-meta">
-        <span *ngIf="users[task.creadoPorId]">Creado por: {{ users[task.creadoPorId].nombre ||
-            users[task.creadoPorId].correoElectronico }}</span>
+        <span *ngIf="users[task.creadoPorId]">Creado por: {{ getUserDisplayName(users[task.creadoPorId]) }}</span>
         <span>Fecha de creación: {{ task.fechaCreacion | date:'dd/MM/yyyy' }}</span>
         <span *ngIf="task.fechaVencimiento">Vence: {{ task.fechaVencimiento | date:'dd/MM/yyyy' }}</span>
     </div>
@@ -41,6 +40,7 @@
                         <th>Creada por</th>
                         <th>Fecha creación</th>
                         <th>Completada por</th>
+                        <th>Asignar</th>
                         <th>Fecha completada</th>
                     </tr>
                 </thead>
@@ -51,17 +51,21 @@
                             <input type="checkbox" [checked]="sub.completada" (change)="toggleSubtaskCompletion(sub)" />
                         </td>
                         <td>
-                            <span *ngIf="sub.creadoPorId && users[sub.creadoPorId]">
-                                {{ users[sub.creadoPorId].nombre || users[sub.creadoPorId].correoElectronico }}
-                            </span>
+                            <span *ngIf="sub.creadoPorId && users[sub.creadoPorId]">{{
+                                getUserDisplayName(users[sub.creadoPorId]) }}</span>
                             <span *ngIf="!sub.creadoPorId">-</span>
                         </td>
                         <td>{{ sub.fechaCreacion ? (sub.fechaCreacion | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
                         <td>
-                            <span *ngIf="sub.completadaPorId && users[sub.completadaPorId]">
-                                {{ users[sub.completadaPorId].nombre || users[sub.completadaPorId].correoElectronico }}
-                            </span>
+                            <span *ngIf="sub.completadaPorId && users[sub.completadaPorId]">{{
+                                getUserDisplayName(users[sub.completadaPorId]) }}</span>
                             <span *ngIf="!sub.completadaPorId">-</span>
+                        </td>
+                        <td>
+                            <p-dropdown [options]="eligibleUsers" [optionValue]="'id'" optionLabel="correoElectronico"
+                                [filter]="true" [showClear]="true" placeholder="Asignar"
+                                (onChange)="assignUserToSubtask(sub, $any($event).value)"
+                                [style]="{ width: '12rem' }"></p-dropdown>
                         </td>
                         <td>{{ sub.fechaCompletada ? (sub.fechaCompletada | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
                     </tr>
@@ -91,9 +95,7 @@
                 <td>{{ t.tiempoFin ? (t.tiempoFin | date:'shortTime') : '-' }}</td>
                 <td>{{ t.notas || '-' }}</td>
                 <td>
-                    <span *ngIf="t.usuarioId && users[t.usuarioId]">
-                        {{ users[t.usuarioId].nombre || users[t.usuarioId].correoElectronico }}
-                    </span>
+                    <span *ngIf="t.usuarioId && users[t.usuarioId]">{{ getUserDisplayName(users[t.usuarioId]) }}</span>
                     <span *ngIf="!t.usuarioId">-</span>
                 </td>
                 <td>
@@ -102,11 +104,12 @@
                 </td>
             </tr>
         </table>
-    </div> <app-modal-agregar-subtarea *ngIf="showAgregarSubtareaModal" [taskId]="task.id"
-        (subtareaAgregada)="$event && onSubtareaAgregada($event)"
+    </div>
+    <app-modal-agregar-subtarea *ngIf="showAgregarSubtareaModal" [taskId]="task.id" [eligibleUsers]="eligibleUsers"
+        [defaultAssigneeId]="currentUserId" (subtareaAgregada)="$event && onSubtareaAgregada($event)"
         (cerrar)="showAgregarSubtareaModal = false"></app-modal-agregar-subtarea>
-    <app-modal-registrar-tiempo *ngIf="showRegistrarTiempoModal"
-        (tiempoRegistrado)="$event && onTiempoRegistrado($event)"
+    <app-modal-registrar-tiempo *ngIf="showRegistrarTiempoModal" [eligibleUsers]="eligibleUsers"
+        [defaultUserId]="currentUserId" (tiempoRegistrado)="$event && onTiempoRegistrado($event)"
         (cerrar)="showRegistrarTiempoModal = false"></app-modal-registrar-tiempo>
 </div>
 <div *ngIf="!task && !loading" class="text-black">No se encontró la tarea.</div>

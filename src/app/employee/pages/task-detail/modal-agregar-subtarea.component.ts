@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
+import { DropdownModule } from 'primeng/dropdown';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -10,7 +11,7 @@ import { Subtask } from '../../../core/model/subtask.model';
 @Component({
   selector: 'app-modal-agregar-subtarea',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DropdownModule],
   template: `
     <div class="modal-backdrop" (click)="close()"></div>
     <div class="modal-content">
@@ -27,6 +28,20 @@ import { Subtask } from '../../../core/model/subtask.model';
         rows="3"
         class="mb-2"
       ></textarea>
+      <div class="mb-3">
+        <label class="block text-sm mb-1">Asignar a</label>
+        <p-dropdown
+          [options]="eligibleUsers"
+          optionLabel="correoElectronico"
+          [filter]="true"
+          [(ngModel)]="selectedUserId"
+          [showClear]="true"
+          [editable]="false"
+          [style]="{ width: '100%' }"
+          [optionValue]="'id'"
+          placeholder="Selecciona un usuario"
+        ></p-dropdown>
+      </div>
       <div class="modal-actions">
         <button (click)="add()" [disabled]="!titulo.trim() || loading">
           {{ loading ? 'Agregando...' : 'Agregar' }}
@@ -41,6 +56,8 @@ import { Subtask } from '../../../core/model/subtask.model';
 })
 export class ModalAgregarSubtareaComponent {
   @Input() taskId!: number;
+  @Input() eligibleUsers: { id: number; correoElectronico: string }[] = [];
+  @Input() defaultAssigneeId?: number | null;
   @Output() subtareaAgregada = new EventEmitter<
     Subtask & { _assignment?: any }
   >();
@@ -50,12 +67,18 @@ export class ModalAgregarSubtareaComponent {
   loading = false;
   error: string | null = null;
   debug = true; // Enable debugging
+  selectedUserId: number | null = null;
 
   constructor(
     private subtasksService: SubtasksService,
     private subtaskAssignmentsService: SubtaskAssignmentsService,
     private loginService: LoginService
   ) {}
+
+  ngOnInit() {
+    this.selectedUserId =
+      this.defaultAssigneeId ?? this.loginService.getCurrentUserId();
+  }
 
   add() {
     if (this.titulo.trim() && this.taskId) {
@@ -66,10 +89,11 @@ export class ModalAgregarSubtareaComponent {
         titulo: this.titulo.trim(),
         texto: this.texto.trim(),
         completada: false,
+        creadoPorId: this.loginService.getCurrentUserId() || undefined,
       };
       this.subtasksService.createForTask(this.taskId, createDto).subscribe({
         next: (subtask: Subtask) => {
-          this.assignToCurrentUser(subtask);
+          this.assignToSelectedUser(subtask);
         },
         error: (err: any) => {
           if (err.status === 400) {
@@ -78,7 +102,7 @@ export class ModalAgregarSubtareaComponent {
               .createForTaskMinimal(this.taskId, this.titulo.trim())
               .subscribe({
                 next: (subtask: Subtask) => {
-                  this.assignToCurrentUser(subtask);
+                  this.assignToSelectedUser(subtask);
                 },
                 error: (fallbackErr: any) => {
                   this.error = `Error al agregar subtarea: ${err.status} ${err.statusText}. Reintento fallido.`;
@@ -94,8 +118,8 @@ export class ModalAgregarSubtareaComponent {
     }
   }
 
-  private assignToCurrentUser(subtask: Subtask) {
-    const userId = this.loginService.getCurrentUserId();
+  private assignToSelectedUser(subtask: Subtask) {
+    const userId = this.selectedUserId || this.loginService.getCurrentUserId();
     if (userId) {
       this.subtaskAssignmentsService
         .create({

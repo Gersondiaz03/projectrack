@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://projectrackbe-production.up.railway.app',
+  apiUrl: 'https://projectrackbe-i26g.onrender.com',
   featureFlag: false,
 };

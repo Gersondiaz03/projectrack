@@ -1,8 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { DropdownModule } from 'primeng/dropdown';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { SubtaskAssignmentsService } from '../../../core/services/subtask-assignments.service';
 import {
   TasksService,
   Task,
@@ -14,6 +16,7 @@ import { ModalAgregarSubtareaComponent } from './modal-agregar-subtarea.componen
 import { SubtasksService } from '../../../core/services/subtasks.service';
 import { TimeTracking } from '../../../core/model/time-tracking.model';
 import { UsersService } from '../../../core/services/users.service';
+import { LoginService } from '../../../auth/services/login.service';
 import { Subtask } from '../../../core/model/subtask.model';
 import { User } from '../../../core/model/user.model';
 
@@ -25,6 +28,7 @@ import { User } from '../../../core/model/user.model';
     FormsModule,
     ModalAgregarSubtareaComponent,
     ModalRegistrarTiempoComponent,
+    DropdownModule,
   ],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.css',
@@ -36,6 +40,8 @@ export class TaskDetailComponent implements OnInit {
   users: { [id: number]: User } = {};
   loading = true;
   Prioridad = Prioridad;
+  eligibleUsers: User[] = [];
+  currentUserId: number | null = null;
 
   showPriorityMenu = false;
   newSubtaskTitle = '';
@@ -54,6 +60,8 @@ export class TaskDetailComponent implements OnInit {
       TimeTrackingService
     ),
     private usersService: UsersService,
+    private loginService: LoginService,
+    private subtaskAssignmentsService: SubtaskAssignmentsService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -77,6 +85,7 @@ export class TaskDetailComponent implements OnInit {
         .subscribe((task) => {
           this.task = task;
           this.fetchUser(task.creadoPorId);
+          this.loadEligibleUsers(task.projectId);
           this.cdr.markForCheck();
         });
     } else {
@@ -84,6 +93,24 @@ export class TaskDetailComponent implements OnInit {
       this.tasksService.findOne(taskId).subscribe((task) => {
         this.task = task;
         this.fetchUser(task.creadoPorId);
+        this.loadEligibleUsers(task.projectId);
+        this.cdr.markForCheck();
+      });
+    }
+  }
+
+  private loadEligibleUsers(projectId: number) {
+    this.currentUserId = this.loginService.getCurrentUserId();
+    if (projectId) {
+      this.usersService.findByProjectId(projectId).subscribe((users) => {
+        // exclude Administrador and Cliente
+        this.eligibleUsers = users.filter(
+          (u) => u.rol !== 'Administrador' && u.rol !== 'Cliente'
+        );
+        // warm cache
+        for (const u of this.eligibleUsers) {
+          if (u.id) this.users[u.id] = u;
+        }
         this.cdr.markForCheck();
       });
     }
@@ -137,7 +164,8 @@ export class TaskDetailComponent implements OnInit {
 
   toggleSubtaskCompletion(subtask: Subtask) {
     if (this.task) {
-      const currentUserId = this.task.creadoPorId;
+      const currentUserId =
+        this.loginService.getCurrentUserId() ?? this.task.creadoPorId;
       this.subtasksService
         .updateForTask(this.task.id, subtask.id, {
           completada: !subtask.completada,
@@ -171,9 +199,10 @@ export class TaskDetailComponent implements OnInit {
     }
   }
 
-  addTimeRecord(start: Date, end: Date, notes?: string) {
+  addTimeRecord(start: Date, end: Date, notes?: string, userId?: number) {
     if (this.task) {
-      const currentUserId = this.task.creadoPorId;
+      const currentUserId =
+        userId ?? this.loginService.getCurrentUserId() ?? this.task.creadoPorId;
       this.timeTrackingService
         .create({
           taskId: this.task.id,
@@ -223,7 +252,26 @@ export class TaskDetailComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  onTiempoRegistrado(event: { start: string; end: string; notes: string }) {
+  assignUserToSubtask(sub: Subtask, userId: number | null) {
+    if (!userId) return;
+    this.subtaskAssignmentsService
+      .create({ subtaskId: sub.id, usuarioId: userId })
+      .subscribe({
+        next: () => {
+          // no-op UI for now; could show a toast
+        },
+        error: () => {
+          // ignore duplicate or error silently for now
+        },
+      });
+  }
+
+  onTiempoRegistrado(event: {
+    start: string;
+    end: string;
+    notes: string;
+    userId?: number;
+  }) {
     if (this.task) {
       const today = new Date();
       const [startHour, startMin] = event.start.split(':').map(Number);
@@ -242,8 +290,21 @@ export class TaskDetailComponent implements OnInit {
         endHour,
         endMin
       );
-      this.addTimeRecord(start, end, event.notes);
+      this.addTimeRecord(start, end, event.notes, event.userId);
     }
     this.showRegistrarTiempoModal = false;
+  }
+  getUserDisplayName(user: User | undefined | null): string {
+    if (!user) return '-';
+    const nameParts = [user.primerNombre, user.segundoNombre]
+      .filter(Boolean)
+      .join(' ');
+    if (nameParts) return nameParts;
+    // @ts-ignore legacy name
+    if ((user as any).nombre) return (user as any).nombre as string;
+    // @ts-ignore legacy username
+    if ((user as any).nombreUsuario)
+      return (user as any).nombreUsuario as string;
+    return user.correoElectronico;
   }
 }
