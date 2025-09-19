@@ -59,7 +59,7 @@
     <div class="border-b-2 border-blue-500 rounded-full w-8 h-8 animate-spin"></div>
   </div>
 
-  <app-modal-delete-project *ngIf="showDeleteModal && projectToDelete" [projectName]="projectToDelete?.nombre ?? ''"
+  <app-modal-delete-project *ngIf="showDeleteModal && projectToDelete" [projectName]="projectToDelete.nombre"
     [error]="deleteError" (confirmDelete)="confirmDeleteProject()"
     (closeModal)="closeDeleteModal()"></app-modal-delete-project>
 </div>
