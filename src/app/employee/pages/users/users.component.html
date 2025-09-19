@@ -1,0 +1,30 @@
+<div *ngIf="!loading" class="p-6">
+  <h2 class="mb-6 font-extrabold text-black text-3xl text-center">
+    Miembros del proyecto: <span class="font-light text-black">{{ projectName }}</span>
+  </h2>
+  <div class="gap-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+    <div *ngFor="let user of users"
+      class="flex flex-col items-center bg-white shadow-lg hover:shadow-2xl p-6 border border-gray-100 rounded-2xl transition-shadow duration-300">
+      <img src="/avatar-placeholder.png" alt="Avatar"
+        class="shadow-md mb-4 border-2 border-primary-200 rounded-full w-20 h-20 object-cover" />
+      <div class="mb-1 font-bold text-black text-xl">{{ user.nombre }}</div>
+      <div class="mb-2 font-semibold text-black text-sm">{{ user.rol }}</div>
+      <div class="mb-4 text-black text-center">{{ user.correoElectronico }}</div>
+      <button
+        class="bg-primary-600 hover:bg-primary-700 shadow mb-2 px-6 py-2 rounded-full font-semibold text-white transition-colors duration-200">Contactar</button>
+      <div class="flex items-center mt-2 text-black text-xs">
+        <svg class="mr-1 w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 17l4 4 4-4m0-5V3m-8 9v6a2 2 0 002 2h4a2 2 0 002-2v-6" />
+        </svg>
+        Miembro desde {{ user.createdAt | date:'longDate' }}
+      </div>
+    </div>
+  </div>
+  <ng-template #noUsers>
+    <div class="mt-8 text-black text-center">No hay usuarios asignados a este proyecto.</div>
+  </ng-template>
+</div>
+<div *ngIf="loading" class="flex justify-center items-center h-64">
+  <span class="text-black text-lg animate-pulse">Cargando usuarios...</span>
+</div>

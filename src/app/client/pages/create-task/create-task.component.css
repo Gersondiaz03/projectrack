@@ -1,0 +1,97 @@
+/*
+  Add elegant, modern, and responsive styles for the create task form and its elements.
+*/
+.create-task-container {
+  max-width: 480px;
+  margin: 32px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px 0 rgba(124, 58, 237, 0.08);
+  padding: 32px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #7c3aed;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+.form-row .form-group {
+  flex: 1;
+}
+input[type="text"],
+input[type="date"],
+select,
+textarea {
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  background: #fafbfc;
+  transition: border 0.2s;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #7c3aed;
+  outline: none;
+}
+textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+.error {
+  color: #dc2626;
+  font-size: 0.92rem;
+  margin-top: 2px;
+}
+.submit-btn {
+  background: linear-gradient(90deg, #7c3aed 0%, #6366f1 100%);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px 0 rgba(124, 58, 237, 0.08);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  cursor: pointer;
+  outline: none;
+  margin-top: 12px;
+}
+.submit-btn:hover,
+.submit-btn:focus {
+  background: linear-gradient(90deg, #6366f1 0%, #7c3aed 100%);
+  box-shadow: 0 4px 16px 0 rgba(124, 58, 237, 0.16);
+  transform: translateY(-2px) scale(1.03);
+}
+@media (max-width: 600px) {
+  .create-task-container {
+    padding: 18px 6px;
+    max-width: 98vw;
+  }
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .form-title {
+    font-size: 1.2rem;
+  }
+  .submit-btn {
+    font-size: 1rem;
+    padding: 10px 0;
+  }
+}

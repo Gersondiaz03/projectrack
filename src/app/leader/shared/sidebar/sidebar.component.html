@@ -1,0 +1,207 @@
+<div class="lg:hidden py-16 text-center">
+  <button type="button"
+    class="inline-flex justify-center items-center gap-x-2 bg-gray-800 hover:bg-gray-950 focus:bg-gray-900 dark:bg-white dark:hover:bg-neutral-200 dark:focus:bg-neutral-200 shadow-2xs px-3 py-2 border border-gray-800 rounded-lg focus:outline-hidden font-medium text-black text-sm text-start align-middle"
+    aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-sidebar-collapsible-group"
+    aria-label="Toggle navigation" data-hs-overlay="#hs-sidebar-collapsible-group">
+    Open
+  </button>
+</div>
+
+<div id="hs-sidebar-collapsible-group"
+  class="hidden lg:block top-0 bottom-0 lg:bottom-0 z-60 fixed bg-white dark:bg-black border-e border-gray-200 dark:border-neutral-700 w-64 h-full transition-all -translate-x-full lg:translate-x-0 hs-overlay-open:translate-x-0 duration-300 hs-overlay [--auto-close:lg] lg:end-auto transform start-0"
+  role="dialog" tabindex="-1" aria-label="Sidebar">
+  <div class="relative flex flex-col h-full max-h-full">
+
+    <header class="flex justify-between items-center gap-x-2 p-4">
+      <a class="flex focus:opacity-80 focus:outline-hidden text-black dark:text-white" [routerLink]="['/leader/main']"
+        aria-label="Brand">
+        <div class="flex flex-col-2 items-center gap-x-2">
+          <img src="ufpslogo.png" class="rounded-xs w-10 h-10" alt="Logo" />
+          <div class="items-center gap-x-2 grid grid-row-2">
+            <span class="font-semibold text-black dark:text-white text-lg">Projectrack</span>
+            <span *ngIf="currentUser" class="text-black dark:text-white text-sm text-wrap">
+              {{ currentUser.primerNombre }} {{ currentUser.segundoNombre }}
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <div class="lg:hidden -me-2">
+
+        <button type="button"
+          class="flex justify-center items-center gap-x-3 bg-white hover:bg-gray-100 focus:bg-gray-100 disabled:opacity-50 border border-gray-200 rounded-full focus:outline-hidden size-6 text-black text-sm disabled:pointer-events-none"
+          data-hs-overlay="#hs-sidebar-collapsible-group">
+          <svg class="size-4 shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+          <span class="sr-only">Close</span>
+        </button>
+
+      </div>
+    </header>
+
+    <nav
+      class="[&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar]:w-2 h-full overflow-y-auto text-black dark:text-white">
+      <div class="hs-accordion-group flex flex-col flex-wrap px-2 pb-0 w-full" data-hs-accordion-always-open>
+        <ul class="space-y-4">
+          <li>
+            <a class="flex items-center gap-x-3.5 hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 px-2.5 py-2 rounded-lg focus:outline-hidden w-full text-black dark:text-white text-sm"
+              [routerLink]="['/leader/recover-password']">
+              <i-lucide [img]="squareUserRound" [size]="15" [color]="'currentColor'"></i-lucide>
+              Recuperar contraseña
+            </a>
+          </li>
+          <li>
+            <div class="divider"></div>
+          </li>
+
+          <li>
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-black text-md dark:text-white">Mis Proyectos</span>
+
+            </div>
+          </li>
+          <li>
+            <cdk-virtual-scroll-viewport itemSize="60" class="virtual-scroll-viewport">
+              <div *cdkVirtualFor="let item of virtualScrollItems; trackBy: trackVirtualItem">
+                <!-- Group header -->
+                <div *ngIf="item.type === 'header'" class="project-group-header">
+                  <div class="flex items-center gap-2 mb-2 px-2.5 py-3">
+                    <span class="font-semibold text-black text-sm">
+                      {{ item.groupDisplayName }} ({{ getGroupData(item).projects.length }})
+                    </span>
+                  </div>
+                </div>
+                <!-- Project item -->
+                <div *ngIf="item.type === 'project'" class="project-item">
+                  <div class="mb-2 ml-4 hs-accordion" [attr.id]="'project-accordion-' + getProject(item).id">
+                    <button type="button"
+                      class="flex justify-between items-center hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 px-2.5 py-2 rounded-lg w-full text-black dark:text-white text-sm hs-accordion-toggle"
+                      aria-expanded="false" [attr.aria-controls]="'project-accordion-sub-' + getProject(item).id">
+                      <div class="flex items-center gap-3">
+                        <span class="flex items-center gap-2">
+                          <span [ngClass]="getColor(getProject(item).id)" class="rounded-full w-2 h-2"></span>
+                          {{ getProject(item).nombre }}
+                        </span>
+                      </div>
+                      <svg class="hidden hs-accordion-active:block size-4 text-black dark:text-white"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="m18 15-6-6-6 6" />
+                      </svg>
+                      <svg class="hs-accordion-active:hidden block size-4 text-black dark:text-white"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+                    <div [attr.id]="'project-accordion-sub-' + getProject(item).id"
+                      class="hidden w-full overflow-hidden transition-[height] duration-300 hs-accordion-content"
+                      role="region" [attr.aria-labelledby]="'project-accordion-' + getProject(item).id">
+                      <ul class="space-y-1 ps-7 pt-1">
+                        <li>
+                          <a class="flex items-center gap-x-3.5 hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 px-2.5 py-2 rounded-lg focus:outline-hidden w-full text-black dark:text-white text-sm"
+                            [routerLink]="['/leader/project', getProject(item).id, 'resumen']">
+                            <i-lucide [img]="clipboardList" [size]="15" [color]="'currentColor'"></i-lucide>
+                            Resumen
+                          </a>
+                        </li>
+                        <li>
+                          <a class="flex items-center gap-x-3.5 hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 px-2.5 py-2 rounded-lg focus:outline-hidden text-black dark:text-white text-sm"
+                            [routerLink]="['/leader/project', getProject(item).id, 'kanban']">
+                            <i-lucide [img]="clipboardList" [size]="15" [color]="'currentColor'"></i-lucide>
+                            Tablero Kanban
+                          </a>
+                        </li>
+                        <li>
+                          <a class="flex items-center gap-x-3.5 hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 px-2.5 py-2 rounded-lg focus:outline-hidden text-black dark:text-white text-sm"
+                            [routerLink]="['/leader/project', getProject(item).id, 'users']">
+                            <i-lucide [img]="userRound" [size]="15" [color]="'currentColor'"></i-lucide>
+                            Usuarios
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </cdk-virtual-scroll-viewport>
+          </li>
+
+        </ul>
+      </div>
+    </nav>
+    <!-- Footer -->
+    <footer class="mt-auto p-2 border-gray-200 dark:border-neutral-700 border-t">
+      <button type="button" (click)="logout()"
+        class="inline-flex items-center gap-x-2 bg-red-100 hover:bg-red-200 focus:bg-red-200 dark:bg-red-800/30 dark:hover:bg-red-800/20 dark:focus:bg-red-800/20 disabled:opacity-50 px-4 py-3 border border-transparent rounded-lg focus:outline-hidden w-full font-medium text-black dark:text-white text-sm disabled:pointer-events-none">
+        Cerrar sesión
+      </button>
+    </footer>
+  </div>
+</div>
+<!-- End Sidebar -->
+<style>
+  @media (max-width: 1024px) {
+    #hs-sidebar-collapsible-group {
+      width: 100vw !important;
+      min-width: 0 !important;
+      left: 0 !important;
+      border-radius: 0 0 1rem 1rem;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  @media (max-width: 640px) {
+    #hs-sidebar-collapsible-group {
+      padding: 0.5rem !important;
+    }
+
+    .space-y-4> :not([hidden])~ :not([hidden]) {
+      margin-top: 0.5rem !important;
+    }
+  }
+
+  .active-link {
+    color: red !important;
+    background: none !important;
+  }
+
+  .virtual-scroll-viewport {
+    height: 700px;
+    width: 100%;
+  }
+
+  .project-group {
+    margin-bottom: 1rem;
+  }
+
+  .project-group:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Custom scrollbar for virtual scroll viewport */
+  .virtual-scroll-viewport .cdk-virtual-scroll-content-wrapper {
+    padding-right: 0.5rem;
+  }
+
+  .virtual-scroll-viewport::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .virtual-scroll-viewport::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .virtual-scroll-viewport::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+
+  .virtual-scroll-viewport::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+</style>

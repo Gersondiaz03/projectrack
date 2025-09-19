@@ -1,0 +1,30 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 40;
+}
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  z-index: 50;
+  min-width: 320px;
+  max-width: 90vw;
+}
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.error {
+  color: #e53e3e;
+  margin-top: 1rem;
+}

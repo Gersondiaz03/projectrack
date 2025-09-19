@@ -1,0 +1,24 @@
+<p>conversation works!</p>
+<div class="bg-white shadow mx-auto p-6 rounded max-w-xl text-black">
+  <div *ngIf="loading" class="text-black">Cargando correo...</div>
+  <div *ngIf="error" class="mb-2 text-black">{{ error }}</div>
+  <ng-container *ngIf="!loading && email">
+    <h2 class="mb-2 font-bold text-xl">{{ email.asunto }}</h2>
+    <div class="mb-2 text-black">De: {{ email.remitente?.nombre || email.remitenteId }}</div>
+    <div class="mb-4 text-black whitespace-pre-line">{{ email.cuerpo }}</div>
+    <div class="mb-6 text-black text-xs">{{ email.fechaEnvio | date:'short' }}</div>
+    <form [formGroup]="responseForm" (ngSubmit)="sendResponse()" class="mt-4">
+      <label class="block mb-1 font-semibold text-black">Responder</label>
+      <textarea formControlName="cuerpo" rows="4" class="mb-2 px-3 py-2 border rounded w-full"
+        placeholder="Escribe tu respuesta..."></textarea>
+      <div *ngIf="responseForm.get('cuerpo')?.touched && responseForm.get('cuerpo')?.invalid"
+        class="mb-2 text-black text-xs">
+        La respuesta es obligatoria y máximo 1000 caracteres.
+      </div>
+      <button type="submit" [disabled]="responseForm.invalid || sending"
+        class="bg-blue-600 px-4 py-2 rounded text-white">
+        {{ sending ? 'Enviando...' : 'Enviar respuesta' }}
+      </button>
+    </form>
+  </ng-container>
+</div>

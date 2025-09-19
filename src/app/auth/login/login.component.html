@@ -1,0 +1,62 @@
+<div class="flex bg-gray-50 min-h-screen">
+
+  <div class="hidden relative md:flex flex-col justify-between rounded-l-2xl w-1/2 overflow-hidden">
+
+    <img src="gestion.png" alt="Mountain" class="z-0 absolute inset-0 w-full h-full object-cover"
+      style="border-bottom-left-radius: 1rem" />
+
+    <div class="z-10 absolute inset-0 bg-blue-900/40"></div>
+
+
+    <div class="z-20 relative flex justify-between items-center p-6">
+      <div class="flex items-center gap-2">
+        <img src="logo1.png" alt="Logo" class="shadow rounded-full w-8 h-8" />
+        <span class="font-bold text-white text-lg">ProjecTrack</span>
+      </div>
+    </div>
+    <div class="z-20 relative flex flex-col flex-1 justify-center items-center px-8">
+      <h1 class="drop-shadow-lg font-extrabold text-white text-4xl md:text-5xl text-center leading-tight">
+        Optimizando la gestión de proyectos<br />
+        Asignación de tareas<br />
+        Y el éxito.
+      </h1>
+    </div>
+  </div>
+
+
+  <!-- Right Panel (Login Form) -->
+  <div class="flex flex-col justify-center items-center bg-white px-8 py-12 rounded-r-2xl w-full md:w-1/2">
+    <div class="w-full max-w-md">
+      <h2 class="mb-8 font-extrabold text-gray-800 text-3xl">Ingresa con tu cuenta</h2>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Email -->
+        <div class="mb-4">
+          <input type="email" formControlName="correoElectronico" class="input-bordered w-full input input-lg"
+            placeholder="Email" autocomplete="email" />
+          <div *ngIf="loginForm.get('correoElectronico')?.touched && loginForm.get('correoElectronico')?.invalid"
+            class="mt-1 text-red-500 text-xs">
+            <span *ngIf="loginForm.get('correoElectronico')?.errors?.['required']">El correo es obligatorio.</span>
+            <span *ngIf="loginForm.get('correoElectronico')?.errors?.['email']">Correo inválido.</span>
+          </div>
+        </div>
+        <!-- Password -->
+        <div class="mb-4">
+          <input type="password" formControlName="contrasena" class="input-bordered w-full input input-lg"
+            placeholder="Password" autocomplete="current-password" />
+          <div *ngIf="loginForm.get('contrasena')?.touched && loginForm.get('contrasena')?.invalid"
+            class="mt-1 text-red-500 text-xs">
+            <span>La contraseña es obligatoria.</span>
+          </div>
+        </div>
+        <!-- Forgot password -->
+        <div class="flex justify-end mb-6">
+          <a routerLink="/recover-password" class="text-red-500 text-sm hover:underline">¿Olvidaste tu contraseña?</a>
+        </div>
+        <!-- Login Button -->
+        <button type="submit" [disabled]="loading" class="mb-2 w-full btn btn-red-800 btn-lg">
+          {{ loading ? 'Cargando...' : 'Ingresa' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

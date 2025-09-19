@@ -1,0 +1,18 @@
+<div class="bg-white shadow mx-auto p-6 rounded max-w-2xl text-black">
+  <h2 class="mb-4 font-bold text-xl">Bandeja de entrada</h2>
+  <button class="bg-blue-600 hover:bg-blue-700 mb-4 px-4 py-2 rounded font-bold text-white"
+    [routerLink]="['/employee/send-email', myUserId]">
+    Enviar correo
+  </button>
+  <div *ngIf="loading" class="text-black">Cargando correos...</div>
+  <div *ngIf="error" class="mb-2 text-black">{{ error }}</div>
+  <div *ngIf="!loading && emails.length === 0" class="text-black">No tienes correos.</div>
+  <ul *ngIf="!loading && emails.length > 0" class="divide-y">
+    <li *ngFor="let email of emails" (click)="openEmail(email)"
+      class="hover:bg-gray-100 px-2 py-3 rounded cursor-pointer">
+      <div class="font-semibold">{{ email.asunto }}</div>
+      <div class="text-black text-sm truncate">{{ email.cuerpo }}</div>
+      <div class="text-black text-xs">{{ email.fechaEnvio | date:'short' }}</div>
+    </li>
+  </ul>
+</div>

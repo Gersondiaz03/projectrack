@@ -1,0 +1,61 @@
+<!-- Cabecera con título y botón -->
+<div class="flex justify-between items-center mb-6 kanban-header">
+  <div class="font-bold text-black dark:text-black text-2xl project-title">{{ projectName }}</div>
+</div>
+
+<!-- Tablero Kanban -->
+<div class="dark:bg-zinc-900 kanban-board" *ngIf="!loading">
+  <div class="kanban-columns">
+    <ng-container *ngFor="let col of columns; let i = index">
+      <div class="dark:bg-zinc-800 dark:border-zinc-700 kanban-column">
+        <!-- Encabezado de columna -->
+        <div class="flex justify-between items-center dark:border-b-zinc-700 text-black kanban-column-header">
+          <div class="flex items-center gap-2">
+            <span class="dot" [ngClass]="'dot-' + col.color"></span>
+            <span class="font-semibold text-black dark:text-black">{{ col.label }}</span>
+            <span class="ml-2 text-black text-xs">
+              {{ tasksByEstado[col.key].length }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Lista arrastrable -->
+        <div cdkDropList class="dark:bg-transparent kanban-list" [id]="dropListIds[i]"
+          [cdkDropListData]="tasksByEstado[col.key]" [cdkDropListConnectedTo]="getConnectedDropLists(i)"
+          (cdkDropListDropped)="onDropFactory(col.key)($event)">
+          <!-- Tarjetas -->
+          <div *ngFor="let task of tasksByEstado[col.key]" cdkDrag
+            class="dark:bg-zinc-800 dark:border-zinc-700 text-black kanban-card" [ngClass]="'kanban-card-' + col.color"
+            [routerLink]="['/client/project', projectId, 'task-detail', task.id]">
+            <div class="flex justify-between items-center mb-1">
+              <span class="dark:bg-red-900 priority priority-alta" *ngIf="task.prioridad === 'Alta'">Prioridad
+                alta</span>
+              <span class="dark:bg-yellow-400 priority priority-media" *ngIf="task.prioridad === 'Media'">Prioridad
+                media</span>
+              <span class="dark:bg-emerald-900 priority priority-baja" *ngIf="task.prioridad === 'Baja'">Prioridad
+                baja</span>
+              <span class="dark:bg-green-900 priority priority-completada"
+                *ngIf="col.key === EstadoTarea.COMPLETADA">Completado</span>
+              <span class="text-black dots">...</span>
+            </div>
+
+            <div class="font-bold text-black">
+              {{ task.nombre }}
+            </div>
+
+            <div class="mb-2 text-black text-xs">
+              {{ task.categoria || col.label }}
+            </div>
+            <div class="mb-2 text-black text-xs">
+              {{ task.descripcion }}
+            </div>
+
+            <div class="flex mt-2">
+              <img src="avatar-placeholder.png" class="dark:border-zinc-800 avatar" alt="Creator" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

@@ -1,0 +1,83 @@
+/* Responsive and modern table styles for main-page */
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Table base styles */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th,
+td {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 220px;
+}
+
+/* Description column: clamp to 1 line with ellipsis */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+  th,
+  td {
+    max-width: 140px;
+    font-size: 0.98rem;
+  }
+}
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  th,
+  td {
+    max-width: 100px;
+    font-size: 0.95rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  h1 {
+    font-size: 1.1rem;
+  }
+}
+@media (max-width: 600px) {
+  .container {
+    padding: 0.25rem;
+  }
+  th,
+  td {
+    max-width: 80px;
+    font-size: 0.92rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+  h1 {
+    font-size: 1rem;
+  }
+}
+
+/* Add horizontal scroll bar for table on small screens */
+.bg-white.shadow.rounded-lg.overflow-x-auto {
+  overflow-x: auto;
+}
+
+/* Hide scroll bar but allow scroll */
+.bg-white.shadow.rounded-lg.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+.bg-white.shadow.rounded-lg.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 4px;
+}

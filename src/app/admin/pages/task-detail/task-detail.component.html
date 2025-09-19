@@ -1,0 +1,112 @@
+<div *ngIf="task" class="task-detail-container">
+  <div class="task-header">
+    <h2>{{ task.nombre }}</h2>
+    <span class="task-category">{{ task.categoria || 'Sin categoría' }}</span>
+    <span class="task-priority" [ngClass]="{
+      'priority-alta': task.prioridad === Prioridad.ALTA,
+      'priority-media': task.prioridad === Prioridad.MEDIA,
+      'priority-baja': task.prioridad === Prioridad.BAJA
+    }" (click)="showPriorityMenu = !showPriorityMenu">
+      Prioridad: {{ task.prioridad }}
+    </span>
+    <div *ngIf="showPriorityMenu" class="priority-menu">
+      <div *ngFor="let p of [Prioridad.ALTA, Prioridad.MEDIA, Prioridad.BAJA]"
+        (click)="changePriority(p); showPriorityMenu = false">
+        <input type="radio" [checked]="task.prioridad === p" /> {{ p }}
+      </div>
+    </div>
+    <button class="delete-task-btn" (click)="deleteTask()">Eliminar tarea</button>
+  </div>
+  <div class="task-meta">
+    <span *ngIf="users[task.creadoPorId]">Creado por: {{ users[task.creadoPorId].nombre ||
+      users[task.creadoPorId].correoElectronico }}</span>
+    <span>Fecha de creación: {{ task.fechaCreacion | date:'dd/MM/yyyy' }}</span>
+    <span *ngIf="task.fechaVencimiento">Vence: {{ task.fechaVencimiento | date:'dd/MM/yyyy' }}</span>
+  </div>
+  <div class="task-description">
+    <h3>Descripción</h3>
+    <p>{{ task.descripcion }}</p>
+  </div>
+
+  <div class="subtasks-section">
+    <div class="flex justify-between items-center mb-2">
+      <h3>Subtareas</h3>
+      <button (click)="showAgregarSubtareaModal = true">Agregar subtarea</button>
+    </div>
+    <ng-container *ngIf="subtasks.length > 0; else noSubtasks">
+      <table class="subtasks-table w-full">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Completada</th>
+            <th>Creada por</th>
+            <th>Fecha creación</th>
+            <th>Completada por</th>
+            <th>Fecha completada</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let sub of subtasks">
+            <td class="font-medium">{{ sub.titulo }}</td>
+            <td>
+              <input type="checkbox" [checked]="sub.completada" (change)="toggleSubtaskCompletion(sub)" />
+            </td>
+            <td>
+              <span *ngIf="sub.creadoPorId && users[sub.creadoPorId]">
+                {{ users[sub.creadoPorId].nombre || users[sub.creadoPorId].correoElectronico }}
+              </span>
+              <span *ngIf="!sub.creadoPorId">-</span>
+            </td>
+            <td>{{ sub.fechaCreacion ? (sub.fechaCreacion | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+            <td>
+              <span *ngIf="sub.completadaPorId && users[sub.completadaPorId]">
+                {{ users[sub.completadaPorId].nombre || users[sub.completadaPorId].correoElectronico }}
+              </span>
+              <span *ngIf="!sub.completadaPorId">-</span>
+            </td>
+            <td>{{ sub.fechaCompletada ? (sub.fechaCompletada | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+    <ng-template #noSubtasks>
+      <div class="text-black">No hay subtareas creadas</div>
+    </ng-template>
+  </div>
+
+  <div class="timetracking-section">
+    <div class="flex justify-between items-center mb-2">
+      <h3>Registros de tiempo</h3>
+      <button (click)="showRegistrarTiempoModal = true">Registrar tiempo</button>
+    </div>
+    <table class="timetracking-table">
+      <tr>
+        <th>Inicio</th>
+        <th>Fin</th>
+        <th>Notas</th>
+        <th>Registrado por</th>
+        <th>Fecha registro</th>
+      </tr>
+      <tr *ngFor="let t of timeRecords">
+        <td>{{ t.tiempoInicio | date:'shortTime' }}</td>
+        <td>{{ t.tiempoFin ? (t.tiempoFin | date:'shortTime') : '-' }}</td>
+        <td>{{ t.notas || '-' }}</td>
+        <td>
+          <span *ngIf="t.usuarioId && users[t.usuarioId]">
+            {{ users[t.usuarioId].nombre || users[t.usuarioId].correoElectronico }}
+          </span>
+          <span *ngIf="!t.usuarioId">-</span>
+        </td>
+        <td>
+          <span *ngIf="t.fechaRegistro">{{ t.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</span>
+          <span *ngIf="!t.fechaRegistro">-</span>
+        </td>
+      </tr>
+    </table>
+  </div> <app-modal-agregar-subtarea *ngIf="showAgregarSubtareaModal" [taskId]="task.id"
+    (subtareaAgregada)="$event && onSubtareaAgregada($event)"
+    (cerrar)="showAgregarSubtareaModal = false"></app-modal-agregar-subtarea>
+  <app-modal-registrar-tiempo *ngIf="showRegistrarTiempoModal" (tiempoRegistrado)="$event && onTiempoRegistrado($event)"
+    (cerrar)="showRegistrarTiempoModal = false"></app-modal-registrar-tiempo>
+</div>
+<div *ngIf="!task && !loading" class="text-black">No se encontró la tarea.</div>

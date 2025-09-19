@@ -1,0 +1,88 @@
+<div class="flex lg:flex-row flex-col gap-6 text-black">
+  <!-- Main Content -->
+  <div class="flex-1">
+    <h2 class="mb-2 font-semibold text-2xl">Bienvenida, {{ userName }}</h2>
+    <p class="mb-6 text-black">Este es tu panel del proyecto <span class="font-bold">{{ projectName }}</span></p>
+    <!-- Tareas asignadas chart -->
+    <div class="bg-white shadow mb-6 p-4 rounded-xl">
+
+      <!-- Chart placeholder -->
+      <div class="flex justify-center items-center h-32"></div>
+    </div>
+    <!-- Tareas próximas -->
+    <div>
+      <h3 class="mb-2 font-semibold text-lg">Tareas próximas</h3>
+      <div class="gap-4 grid grid-cols-1 md:grid-cols-2">
+        <a *ngFor="let tarea of tareasProximas" class="bg-white shadow p-4 rounded-xl resumen-tarea-card"
+          [routerLink]="['/leader/project', projectId, 'task-detail', tarea.id]">
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-semibold">{{ tarea.nombre }}</span>
+            <span class="text-black text-xs">{{ tarea.categoria || tarea.prioridad }}</span>
+          </div>
+          <div class="mb-2">
+            <span class="text-black text-xs">Progreso</span>
+            <div class="bg-gray-200 mt-1 rounded-full w-full h-2">
+              <div class="bg-red-500 rounded-full h-2"
+                [style.width.%]="tarea.completada ? 100 : (tarea.estado === 'Completada' ? 100 : 75)"></div>
+            </div>
+            <span class="font-semibold text-black text-xs">{{ tarea.completada ? 100 : (tarea.estado === 'Completada'
+              ? 100 : 75) }}%</span>
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-black text-xs">
+              {{ tarea.fechaVencimiento ? ('Faltan ' + daysLeft(tarea.fechaVencimiento) + ' días') : '' }}
+            </span>
+            <span class="px-2 py-0.5 rounded text-black text-xs"
+              [ngClass]="tarea.prioridad === 'Alta' ? 'bg-red-100' : tarea.prioridad === 'Media' ? 'bg-yellow-100' : 'bg-green-100'">
+              Prioridad {{ tarea.prioridad }}
+            </span>
+          </div>
+          <!-- Miembros placeholder, replace with real data if available -->
+          <div class="flex -space-x-2">
+            <ng-container *ngFor="let miembro of projectMiembros">
+              <img src="/avatar-placeholder.png" class="border-2 border-white rounded-full w-6 h-6"
+                [alt]="miembroNombres[miembro]" />
+              <span class="ml-1 text-xs">{{ miembroNombres[miembro] }}</span>
+            </ng-container>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+  <!-- Sidebar Content -->
+  <aside class="flex flex-col flex-shrink-0 gap-6 w-full lg:w-80">
+    <div class="bg-white shadow p-4 rounded-xl">
+      <div class="mb-2">
+        <span class="font-semibold">Detalles del proyecto</span>
+      </div>
+      <div class="mb-2">
+        <span class="font-bold">{{ projectName }}</span>
+        <span class="block text-black text-xs">Cliente {{ projectCliente }}</span>
+      </div>
+      <div class="mb-2">
+        <span class="text-black text-xs">Progreso</span>
+        <div class="bg-gray-200 mt-1 rounded-full w-full h-2">
+          <div class="bg-red-500 rounded-full h-2" [style.width.%]="projectProgreso"></div>
+        </div>
+        <span class="font-semibold text-black text-xs">{{ projectProgreso }}%</span>
+      </div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-black text-xs">Tiempo estimado: </span>
+        <span class="text-black text-xs">{{ projectTiempoEstimado }}</span>
+        <div class="flex -space-x-2">
+          <ng-container *ngFor="let miembro of projectMiembros">
+            <img src="/avatar-placeholder.png" class="border-2 border-white rounded-full w-6 h-6"
+              [alt]="miembroNombres[miembro]" />
+            <span class="ml-1 text-xs">{{ miembroNombres[miembro] }}</span>
+          </ng-container>
+        </div>
+      </div>
+      <div class="mb-2">
+        <span class="text-black text-xs">Descripción</span>
+        <p class="mt-1 text-black text-xs">{{ projectDescripcion }}</p>
+      </div>
+      <button class="bg-red-700 hover:bg-red-800 mt-2 py-2 rounded-lg w-full font-semibold text-black"
+        [routerLink]="['/leader/project', projectId, 'kanban']">Visitar tablero Kanban</button>
+    </div>
+  </aside>
+</div>

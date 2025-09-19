@@ -1,0 +1,132 @@
+CREATE TABLE usuarios (
+    id_usuario SERIAL PRIMARY KEY,
+    nombre_usuario VARCHAR(50) UNIQUE NOT NULL,
+    correo_electronico VARCHAR(100) UNIQUE NOT NULL,
+    contrasena VARCHAR(255) NOT NULL,
+    primer_nombre VARCHAR(50) NOT NULL,
+    primer_apellido VARCHAR(50) NOT NULL,
+    segundo_nombre VARCHAR(50),
+    segundo_apellido VARCHAR(50) NOT NULL,
+    rol VARCHAR(20) NOT NULL CHECK (rol IN ('Administrador', 'Líder de Proyecto', 'Empleado', 'Cliente')),
+    fecha_registro TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    posicion VARCHAR(100)
+);
+
+
+CREATE TABLE proyectos (
+    id_proyecto SERIAL PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    descripcion TEXT,
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    estado VARCHAR(20) CHECK (estado IN ('Abierto', 'En Progreso', 'Completado', 'Archivado', 'Pausado')),
+    creado_por INTEGER REFERENCES usuarios(id_usuario),
+    fecha_creacion TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_creado_por_admin CHECK (EXISTS (SELECT 1 FROM usuarios WHERE id_usuario = proyectos.creado_por AND rol = 'Administrador'))
+);
+
+
+CREATE TABLE tareas (
+    id_tarea SERIAL PRIMARY KEY,
+    id_proyecto INTEGER REFERENCES proyectos(id_proyecto),
+    nombre VARCHAR(255) NOT NULL,
+    descripcion TEXT,
+    fecha_inicio DATE,
+    fecha_vencimiento DATE,
+    estado VARCHAR(20) CHECK (estado IN ('Por Hacer', 'En Progreso', 'Completada', 'Bloqueada')),
+    prioridad VARCHAR(10) CHECK (prioridad IN ('Alta', 'Media', 'Baja')),
+    creado_por INTEGER REFERENCES usuarios(id_usuario),
+    fecha_creacion TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    categoria VARCHAR(100),
+    solicitud_revision BOOLEAN DEFAULT FALSE,
+    calificacion_revision INTEGER CHECK (calificacion_revision >= 0 AND calificacion_revision <= 100),
+    completada BOOLEAN DEFAULT FALSE
+);
+
+
+CREATE TABLE asignaciones_tareas (
+    id_asignacion_tarea SERIAL PRIMARY KEY,
+    id_tarea INTEGER REFERENCES tareas(id_tarea),
+    id_usuario INTEGER REFERENCES usuarios(id_usuario) CHECK (EXISTS (SELECT 1 FROM usuarios WHERE id_usuario = asignaciones_tareas.id_usuario AND rol IN ('Empleado', 'Líder de Proyecto'))),
+    UNIQUE (id_tarea, id_usuario)
+);
+
+
+CREATE TABLE usuarios_proyectos (
+    id_usuario_proyecto SERIAL PRIMARY KEY,
+    id_proyecto INTEGER REFERENCES proyectos(id_proyecto),
+    id_usuario INTEGER REFERENCES usuarios(id_usuario),
+    rol_en_proyecto VARCHAR(20) CHECK (rol_en_proyecto IN ('Administrador', 'Líder de Proyecto', 'Empleado', 'Cliente')),
+    UNIQUE (id_proyecto, id_usuario),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    CONSTRAINT fk_rol_proyecto_usuario CHECK (usuarios_proyectos.rol_en_proyecto = (SELECT rol FROM usuarios WHERE id_usuario = usuarios_proyectos.id_usuario))
+);
+
+
+CREATE TABLE registro_tiempo_tareas (
+    id_registro_tiempo SERIAL PRIMARY KEY,
+    id_tarea INTEGER REFERENCES tareas(id_tarea),
+    id_usuario INTEGER REFERENCES usuarios(id_usuario),
+    tiempo_inicio TIMESTAMP WITHOUT TIME ZONE,
+    tiempo_fin TIMESTAMP WITHOUT TIME ZONE,
+    fecha_registro DATE DEFAULT CURRENT_DATE,
+    notas TEXT,
+    fecha_creacion TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE notificacion (
+    id_notificacion SERIAL PRIMARY KEY,
+    id_usuario INTEGER REFERENCES usuarios(id_usuario),
+    mensaje TEXT NOT NULL,
+    tipo VARCHAR(50),
+    fecha_creacion TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    leida BOOLEAN DEFAULT FALSE
+);
+
+
+CREATE TABLE correos ( -- Renombrada de correos_enviados
+    id_correo SERIAL PRIMARY KEY,
+    id_destinatario INTEGER NOT NULL,
+    id_remitente INTEGER NOT NULL,
+    asunto VARCHAR(255) NOT NULL,
+    cuerpo TEXT NOT NULL,
+    fecha_envio TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_destinatario) REFERENCES usuarios(id_usuario), -- Constraint FK para destinatario
+    FOREIGN KEY (id_remitente) REFERENCES usuarios(id_usuario)     -- Constraint FK para remitente
+);
+
+
+CREATE TABLE subtareas (
+    id_subtarea SERIAL PRIMARY KEY,
+    id_tarea INTEGER REFERENCES tareas(id_tarea),
+    titulo VARCHAR(255) NOT NULL,
+    texto TEXT,
+    completada BOOLEAN DEFAULT FALSE
+);
+
+
+CREATE TABLE asignaciones_subtareas (
+    id_asignacion_subtarea SERIAL PRIMARY KEY,
+    id_subtarea INTEGER REFERENCES subtareas(id_subtarea),
+    id_usuario INTEGER REFERENCES usuarios(id_usuario) CHECK (EXISTS (SELECT 1 FROM usuarios WHERE id_usuario = asignaciones_subtareas.id_usuario AND rol = 'Empleado')),
+    UNIQUE (id_subtarea, id_usuario)
+);
+
+CREATE INDEX idx_usuarios_rol ON usuarios (rol);
+CREATE INDEX idx_proyectos_estado ON proyectos (estado);
+CREATE INDEX idx_tareas_id_proyecto ON tareas (id_proyecto);
+CREATE INDEX idx_registro_tiempo_tareas_id_tarea ON registro_tiempo_tareas (id_tarea);
+CREATE INDEX idx_registro_tiempo_tareas_id_usuario ON registro_tiempo_tareas (id_usuario);
+CREATE INDEX idx_notificacion_id_usuario ON notificacion (id_usuario); -- Corregido nombre de tabla
+CREATE INDEX idx_usuarios_proyectos_id_proyecto ON usuarios_proyectos (id_proyecto);
+CREATE INDEX idx_usuarios_proyectos_id_usuario ON usuarios_proyectos (id_usuario);
+CREATE INDEX idx_subtareas_id_tarea ON subtareas (id_tarea);
+CREATE INDEX idx_asignaciones_tareas_id_tarea ON asignaciones_tareas (id_tarea);
+CREATE INDEX idx_asignaciones_tareas_id_usuario ON asignaciones_tareas (id_usuario);
+CREATE INDEX idx_asignaciones_subtareas_id_subtarea ON asignaciones_subtareas (id_subtarea);
+CREATE INDEX idx_asignaciones_subtareas_id_usuario ON asignaciones_subtareas (id_usuario);
+CREATE INDEX idx_correos_id_destinatario ON correos (id_destinatario); -- Índice para FK destinatario
+CREATE INDEX idx_correos_id_remitente ON correos (id_remitente);       -- Índice para FK remitente

@@ -1,0 +1,50 @@
+<div class="bg-gray-50 px-4 py-8 min-h-screen">
+  <form [formGroup]="form" (ngSubmit)="submit()"
+    class="bg-white shadow-lg mx-auto p-8 border border-gray-200 rounded-lg max-w-md">
+    <h2 class="mb-6 font-bold text-black text-2xl text-center">Editar Proyecto</h2>
+
+    <div class="mb-4">
+      <label class="block mb-2 font-semibold text-black">Nombre <span class="text-red-500">*</span></label>
+      <input pInputText type="text" formControlName="nombre" placeholder="Ingresa el nombre del proyecto" class="w-full"
+        [ngClass]="{'border-red-500': nombre?.invalid && (nombre?.touched || nombre?.dirty)}" />
+      <div *ngIf="nombre?.invalid && (nombre?.touched || nombre?.dirty)" class="mt-1 text-red-500 text-sm">
+        <div *ngIf="nombre?.errors?.['required']">El nombre es obligatorio.</div>
+        <div *ngIf="nombre?.errors?.['minlength']">Mínimo 3 caracteres.</div>
+        <div *ngIf="nombre?.errors?.['maxlength']">Máximo 255 caracteres.</div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="block mb-2 font-semibold text-black">Descripción</label>
+      <textarea pInputTextarea formControlName="descripcion" placeholder="Describe el proyecto..." class="w-full"
+        autoResize="true" rows="3"></textarea>
+    </div>
+
+    <div class="mb-4">
+      <label class="block mb-2 font-semibold text-black">Fecha de inicio</label>
+      <p-datepicker formControlName="fechaInicio" inputId="fi" [showIcon]="true" dateFormat="dd/mm/yy"
+        placeholder="Selecciona fecha de inicio" styleClass="w-full" />
+    </div>
+
+    <div class="mb-4">
+      <label class="block mb-2 font-semibold text-black">Fecha de fin</label>
+      <p-datepicker formControlName="fechaFin" inputId="ff" [showIcon]="true" dateFormat="dd/mm/yy"
+        placeholder="Selecciona fecha de fin" styleClass="w-full" />
+    </div>
+
+    <div class="mb-4">
+      <label class="block mb-2 font-semibold text-black">Estado</label>
+      <p-select formControlName="estado" [options]="estadoOptions" optionLabel="label" optionValue="value"
+        placeholder="Selecciona un estado" styleClass="w-full" />
+    </div>
+
+    <div *ngIf="error" class="mb-4 text-red-500 text-center">{{ error }}</div>
+
+    <button type="submit"
+      class="bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded-lg w-full font-medium text-white transition-colors"
+      [disabled]="loading || form.invalid">
+      <span *ngIf="loading" class="mr-2 animate-spin">⏳</span>
+      {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
+    </button>
+  </form>
+</div>

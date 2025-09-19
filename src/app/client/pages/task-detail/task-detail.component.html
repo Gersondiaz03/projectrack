@@ -1,0 +1,111 @@
+<div *ngIf="task" class="task-detail-container">
+    <div class="task-header">
+        <h2 class="text-black dark:text-black">{{ task.nombre }}</h2>
+        <span class="text-black dark:text-black task-category">{{ task.categoria || 'Sin categoría' }}</span>
+        <span class="text-black dark:text-black task-priority" [ngClass]="{
+      'priority-alta': task.prioridad === Prioridad.ALTA,
+      'priority-media': task.prioridad === Prioridad.MEDIA,
+      'priority-baja': task.prioridad === Prioridad.BAJA
+    }" (click)="showPriorityMenu = !showPriorityMenu">
+            Prioridad: {{ task.prioridad }}
+        </span>
+        <div *ngIf="showPriorityMenu" class="text-black dark:text-black priority-menu">
+            <div *ngFor="let p of [Prioridad.ALTA, Prioridad.MEDIA, Prioridad.BAJA]"
+                (click)="changePriority(p); showPriorityMenu = false">
+                <input type="radio" [checked]="task.prioridad === p" /> <span class="text-black dark:text-black">{{ p
+                    }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="text-black dark:text-black task-meta">
+        <span *ngIf="users[task.creadoPorId]">Creado por: {{ users[task.creadoPorId].nombre ||
+            users[task.creadoPorId].correoElectronico }}</span>
+        <span>Fecha de creación: {{ task.fechaCreacion | date:'dd/MM/yyyy' }}</span>
+        <span *ngIf="task.fechaVencimiento">Vence: {{ task.fechaVencimiento | date:'dd/MM/yyyy' }}</span>
+    </div>
+    <div class="task-description">
+        <h3 class="text-black dark:text-black">Descripción</h3>
+        <p class="text-black dark:text-black">{{ task.descripcion }}</p>
+    </div>
+
+    <div class="subtasks-section">
+        <div class="flex justify-between items-center mb-2">
+            <h3 class="text-black dark:text-black">Subtareas</h3>
+        </div>
+        <ng-container *ngIf="subtasks.length > 0; else noSubtasks">
+            <table class="subtasks-table w-full text-black dark:text-black">
+                <thead>
+                    <tr>
+                        <th class="text-black dark:text-black">Título</th>
+                        <th class="text-black dark:text-black">Completada</th>
+                        <th class="text-black dark:text-black">Creada por</th>
+                        <th class="text-black dark:text-black">Fecha creación</th>
+                        <th class="text-black dark:text-black">Completada por</th>
+                        <th class="text-black dark:text-black">Fecha completada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let sub of subtasks">
+                        <td class="font-medium text-black dark:text-black">{{ sub.titulo }}</td>
+                        <td>
+                            <input type="checkbox" [checked]="sub.completada" (change)="toggleSubtaskCompletion(sub)" />
+                        </td>
+                        <td class="text-black dark:text-black">
+                            <span *ngIf="sub.creadoPorId && users[sub.creadoPorId]">
+                                {{ users[sub.creadoPorId].nombre || users[sub.creadoPorId].correoElectronico }}
+                            </span>
+                            <span *ngIf="!sub.creadoPorId">-</span>
+                        </td>
+                        <td class="text-black dark:text-black">{{ sub.fechaCreacion ? (sub.fechaCreacion | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+                        <td class="text-black dark:text-black">
+                            <span *ngIf="sub.completadaPorId && users[sub.completadaPorId]">
+                                {{ users[sub.completadaPorId].nombre || users[sub.completadaPorId].correoElectronico }}
+                            </span>
+                            <span *ngIf="!sub.completadaPorId">-</span>
+                        </td>
+                        <td class="text-black dark:text-black">{{ sub.fechaCompletada ? (sub.fechaCompletada | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </ng-container>
+        <ng-template #noSubtasks>
+            <div class="text-black dark:text-black">No hay subtareas creadas</div>
+        </ng-template>
+    </div>
+
+    <div class="timetracking-section">
+        <div class="flex justify-between items-center mb-2">
+            <h3 class="text-black dark:text-black">Registros de tiempo</h3>
+        </div>
+        <table class="timetracking-table text-black dark:text-black">
+            <tr>
+                <th class="text-black dark:text-black">Inicio</th>
+                <th class="text-black dark:text-black">Fin</th>
+                <th class="text-black dark:text-black">Notas</th>
+                <th class="text-black dark:text-black">Registrado por</th>
+                <th class="text-black dark:text-black">Fecha registro</th>
+            </tr>
+            <tr *ngFor="let t of timeRecords">
+                <td class="text-black dark:text-black">{{ t.tiempoInicio | date:'shortTime' }}</td>
+                <td class="text-black dark:text-black">{{ t.tiempoFin ? (t.tiempoFin | date:'shortTime') : '-' }}</td>
+                <td class="text-black dark:text-black">{{ t.notas || '-' }}</td>
+                <td class="text-black dark:text-black">
+                    <span *ngIf="t.usuarioId && users[t.usuarioId]">
+                        {{ users[t.usuarioId].nombre || users[t.usuarioId].correoElectronico }}
+                    </span>
+                    <span *ngIf="!t.usuarioId">-</span>
+                </td>
+                <td class="text-black dark:text-black">
+                    <span *ngIf="t.fechaRegistro">{{ t.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</span>
+                    <span *ngIf="!t.fechaRegistro">-</span>
+                </td>
+            </tr>
+        </table>
+    </div> <app-modal-agregar-subtarea *ngIf="showAgregarSubtareaModal" [taskId]="task.id"
+        (subtareaAgregada)="$event && onSubtareaAgregada($event)"
+        (cerrar)="showAgregarSubtareaModal = false"></app-modal-agregar-subtarea>
+    <app-modal-registrar-tiempo *ngIf="showRegistrarTiempoModal"
+        (tiempoRegistrado)="$event && onTiempoRegistrado($event)"
+        (cerrar)="showRegistrarTiempoModal = false"></app-modal-registrar-tiempo>
+</div>
+<div *ngIf="!task && !loading" class="text-black dark:text-black">No se encontró la tarea.</div>

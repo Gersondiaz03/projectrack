@@ -1,0 +1,65 @@
+<div class="mx-auto p-4 container">
+  <h1 class="mb-4 font-bold text-black text-xl">Mis Proyectos</h1>
+
+  <div class="bg-white shadow rounded-lg overflow-x-auto text-black">
+    <table class="bg-white min-w-full">
+      <thead>
+        <tr class="bg-gray-100 border-b">
+          <th class="px-4 py-3 font-semibold text-black text-left">Nombre</th>
+          <th class="px-4 py-3 font-semibold text-black text-left">Estado</th>
+          <th class="hidden md:table-cell px-4 py-3 font-semibold text-black text-left">Fecha inicio</th>
+          <th class="hidden md:table-cell px-4 py-3 font-semibold text-black text-left">Fecha fin</th>
+          <th class="hidden lg:table-cell px-4 py-3 font-semibold text-black text-left">Descripción</th>
+          <th class="px-4 py-3 font-semibold text-black text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="projects && projects.length > 0; else noData">
+          <tr *ngFor="let project of projects" class="hover:bg-gray-50 border-b">
+            <td class="px-4 py-3">{{ project.nombre }}</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-1 rounded-full text-black text-xs" [ngClass]="{
+                  'bg-green-100': project.estado === 'Completado',
+                  'bg-blue-100': project.estado === 'En Progreso',
+                  'bg-yellow-100': project.estado === 'Abierto' || project.estado === 'Pausado',
+                  'bg-gray-200': project.estado === 'Archivado'
+                }">
+                {{ project.estado || 'Sin estado' }}
+              </span>
+            </td>
+            <td class="hidden md:table-cell px-4 py-3">{{ formatDate(project.fechaInicio) }}</td>
+            <td class="hidden md:table-cell px-4 py-3">{{ formatDate(project.fechaFin) }}</td>
+            <td class="hidden lg:table-cell px-4 py-3">
+              <span class="line-clamp-1">{{ project.descripcion }}</span>
+            </td>
+            <td class="px-4 py-3 text-center">
+              <a [routerLink]="['/admin', 'project', project.id, 'resumen']"
+                class="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded text-white text-sm">
+                Ver detalles
+              </a>
+              <button (click)="openDeleteModal(project)"
+                class="bg-red-500 hover:bg-red-600 ml-2 px-3 py-1 rounded text-white text-sm">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+        <ng-template #noData>
+          <tr>
+            <td colspan="6" class="py-8 text-black text-center">
+              No hay proyectos asignados
+            </td>
+          </tr>
+        </ng-template>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center mt-4">
+    <div class="border-b-2 border-blue-500 rounded-full w-8 h-8 animate-spin"></div>
+  </div>
+
+  <app-modal-delete-project *ngIf="showDeleteModal && projectToDelete" [projectName]="projectToDelete?.nombre ?? ''"
+    [error]="deleteError" (confirmDelete)="confirmDeleteProject()"
+    (closeModal)="closeDeleteModal()"></app-modal-delete-project>
+</div>

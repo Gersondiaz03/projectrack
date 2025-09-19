@@ -1,0 +1,7 @@
+/* Make lucide icons white when in dark mode */
+:host-context(.dark) i-lucide svg,
+:host-context(.dark) i-lucide svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: #ffffff !important;
+}

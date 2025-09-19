@@ -1,0 +1,24 @@
+<div class="z-50 fixed inset-0 flex justify-center items-center bg-black bg-opacity-40">
+  <div class="relative bg-white shadow-lg p-6 rounded-lg w-full max-w-md text-black">
+    <button (click)="closeModal()" class="top-2 right-2 absolute text-black">
+      <span class="material-icons">close</span>
+    </button>
+    <h2 class="mb-4 font-semibold text-lg">Notificaciones</h2>
+    <button (click)="markAllAsRead()" class="mb-2 text-black text-sm hover:underline">Marcar todas como
+      leídas</button>
+    <div *ngIf="loading" class="py-4 text-black text-center">Cargando...</div>
+    <ul *ngIf="!loading && notifications.length > 0" class="space-y-2 max-h-80 overflow-y-auto">
+      <li *ngFor="let n of notifications" [class.opacity-60]="n.leida"
+        class="flex justify-between items-center p-3 border border-gray-200 rounded">
+        <div>
+          <div class="font-medium">{{ n.mensaje }}</div>
+          <div class="text-black text-xs">{{ n.fechaCreacion | date:'short' }}</div>
+        </div>
+        <button *ngIf="!n.leida" (click)="markAsRead(n)" class="ml-2 text-black text-xs hover:underline">Marcar como
+          leída</button>
+      </li>
+    </ul>
+    <div *ngIf="!loading && notifications.length === 0" class="py-4 text-black text-center">No tienes notificaciones.
+    </div>
+  </div>
+</div>
